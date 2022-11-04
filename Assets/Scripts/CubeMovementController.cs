@@ -7,7 +7,7 @@ public class CubeMovementController : MonoBehaviour
     [SerializeField] private Transform cubeStartPosition;
     [SerializeField] private float speed;
     [SerializeField] private float spawnTime;
-    [SerializeField] private float distancePositionZ;
+    [SerializeField] private float distance;
 
     private float timeToDestination;
     private float gameTime;
@@ -18,11 +18,7 @@ public class CubeMovementController : MonoBehaviour
         if (CanParse(value))
         {
             speed = temp;
-
-            if (speed == 0)
-                timeToDestination = 0;
-            else
-                timeToDestination = distancePositionZ / speed;
+            timeToDestination = distance / speed;
         }
     }
 
@@ -35,11 +31,13 @@ public class CubeMovementController : MonoBehaviour
     public void SetDistanceValue(string value)
     {
         if (CanParse(value))
-            distancePositionZ = temp;
+            distance = temp;
     }
 
     private bool CanParse(string value)
     {
+        if (string.IsNullOrEmpty(value)) return false;
+        
         if (float.TryParse(value, out temp))
             return true;
         else
@@ -64,6 +62,6 @@ public class CubeMovementController : MonoBehaviour
 
     private void MoveCube(GameObject cube)
     {
-        cube.transform.DOLocalMoveZ(distancePositionZ, timeToDestination);
+        cube.transform.DOLocalMoveZ(distance, timeToDestination).SetEase(Ease.Linear);
     }
 }
