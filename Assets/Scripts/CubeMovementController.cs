@@ -23,11 +23,7 @@ public class CubeMovementController : MonoBehaviour
         if (CanParse(value, ref isSpeedValueInput))
         {
             speed = temp;
-
-            if (speed == 0)
-                timeToDestination = 0;
-            else
-                timeToDestination = distance / speed;
+            timeToDestination = distance / speed;
         }
     }
 
@@ -45,7 +41,7 @@ public class CubeMovementController : MonoBehaviour
 
     private bool CanParse(string value, ref bool isValueInput)
     {
-        if (float.TryParse(value, out temp))
+        if (float.TryParse(value, out temp) && temp != 0)
         {
             isValueInput = true;
             return true;

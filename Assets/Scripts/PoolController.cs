@@ -11,6 +11,8 @@ public class PoolController : MonoBehaviour
 
     public void PutInPool(GameObject go)
     {
+        if (go == null) return;
+
         go.SetActive(false);
         go.transform.parent = poolParent;
         go.transform.SetPositionAndRotation(Vector3.zero, Quaternion.identity);
@@ -26,7 +28,6 @@ public class PoolController : MonoBehaviour
         go.transform.parent = startTransform;
         go.transform.SetPositionAndRotation(startTransform.position, startTransform.rotation);
         go.SetActive(true);
-        Debug.Log("GetFromPool");
         return go;
     }
 
@@ -45,7 +46,7 @@ public class PoolController : MonoBehaviour
 
     private void GenerateObject(GameObject prefab)
     {
-        var go = Instantiate(prefab, Vector3.zero, Quaternion.identity, poolParent);
+        var go = Instantiate(prefab, Vector3.zero, Quaternion.identity);
         PutInPool(go);
     }
 }
