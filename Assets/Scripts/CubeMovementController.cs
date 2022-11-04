@@ -21,10 +21,7 @@ public class CubeMovementController : MonoBehaviour
     public void SetSpeedValue(string value)
     {
         if (CanParse(value, ref isSpeedValueInput))
-        {
             speed = temp;
-            timeToDestination = distance / speed;
-        }
     }
 
     public void SetSpawnTimeValue(string value)
@@ -66,6 +63,7 @@ public class CubeMovementController : MonoBehaviour
     {
         if (gameTime < spawnTime) return;
 
+        timeToDestination = distance / speed;
         var cube = poolController.GetFromPool(cubeStartPosition);
         MoveCube(cube);
         StartCoroutine(DelayCubeDisactivation(cube, timeToDestination));
