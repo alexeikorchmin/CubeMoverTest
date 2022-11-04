@@ -1,9 +1,10 @@
+using System.Collections;
 using UnityEngine;
 using DG.Tweening;
 
 public class CubeMovementController : MonoBehaviour
 {
-    [SerializeField] private GameObject cubePrefab;
+    [SerializeField] private PoolController poolController;
     [SerializeField] private Transform cubeStartPosition;
     [SerializeField] private float speed;
     [SerializeField] private float spawnTime;
@@ -13,39 +14,54 @@ public class CubeMovementController : MonoBehaviour
     private float gameTime;
     private float temp;
 
+    private bool isSpeedValueInput;
+    private bool isSpawnTimeValueInput;
+    private bool isDistanceValueInput;
+
     public void SetSpeedValue(string value)
     {
-        if (CanParse(value))
+        if (CanParse(value, ref isSpeedValueInput))
         {
             speed = temp;
-            timeToDestination = distance / speed;
+
+            if (speed == 0)
+                timeToDestination = 0;
+            else
+                timeToDestination = distance / speed;
         }
     }
 
     public void SetSpawnTimeValue(string value)
     {
-        if (CanParse(value))
+        if (CanParse(value, ref isSpawnTimeValueInput))
             spawnTime = temp;
     }
 
     public void SetDistanceValue(string value)
     {
-        if (CanParse(value))
+        if (CanParse(value, ref isDistanceValueInput))
             distance = temp;
     }
 
-    private bool CanParse(string value)
+    private bool CanParse(string value, ref bool isValueInput)
     {
-        if (string.IsNullOrEmpty(value)) return false;
-        
         if (float.TryParse(value, out temp))
+        {
+            isValueInput = true;
             return true;
+        }
         else
+        {
+            isValueInput = false;
             return false;
+        }
     }
 
     private void Update()
     {
+        if (!isSpeedValueInput || !isSpawnTimeValueInput || !isDistanceValueInput)
+            return;
+
         gameTime += Time.deltaTime;
         CubeBehaviour();
     }
@@ -54,14 +70,20 @@ public class CubeMovementController : MonoBehaviour
     {
         if (gameTime < spawnTime) return;
 
-        GameObject cubeInstance = Instantiate(cubePrefab, cubeStartPosition.position, Quaternion.identity);
-        MoveCube(cubeInstance);
-        Destroy(cubeInstance, timeToDestination);
+        var cube = poolController.GetFromPool(cubeStartPosition);
+        MoveCube(cube);
+        StartCoroutine(DelayCubeDisactivation(cube, timeToDestination));
         gameTime = 0f;
     }
 
     private void MoveCube(GameObject cube)
     {
         cube.transform.DOLocalMoveZ(distance, timeToDestination).SetEase(Ease.Linear);
+    }
+
+    private IEnumerator DelayCubeDisactivation(GameObject go, float time)
+    {
+        yield return new WaitForSeconds(time);
+        poolController.PutInPool(go);
     }
 }
